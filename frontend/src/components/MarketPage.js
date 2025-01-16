@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import './MarketPage.css';
 import Chart from 'chart.js/auto';
-import ReactMarkdown from "react-markdown"; // Import ReactMarkdown for rendering Markdown
+import ReactMarkdown from "react-markdown";
 
 const MarketPage = () => {
-    const [companySymbol, setCompanySymbol] = useState("");
+    const [inputSymbol, setInputSymbol] = useState(""); // Separate input state
+    const [companySymbol, setCompanySymbol] = useState(""); // For displaying results
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [stockData, setStockData] = useState(null);
@@ -13,12 +14,17 @@ const MarketPage = () => {
     const [timeFrame, setTimeFrame] = useState("1Y");
 
     const searchStock = async () => {
+        if (!inputSymbol.trim()) {
+            setError("Please enter a valid stock symbol.");
+            return;
+        }
+
         setLoading(true);
         setError("");
         setStockData(null);
 
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/search/${companySymbol}`);
+            const response = await axios.get(`http://127.0.0.1:5000/search/${inputSymbol}`);
             const data = response.data;
 
             if (data.error) {
@@ -26,6 +32,7 @@ const MarketPage = () => {
                 return;
             }
 
+            setCompanySymbol(inputSymbol); // Update the result symbol only on success
             setStockData(data);
             updateChart(data.historical_data);
         } catch (err) {
@@ -97,8 +104,8 @@ const MarketPage = () => {
             <div className="search-container">
                 <input
                     type="text"
-                    value={companySymbol}
-                    onChange={(e) => setCompanySymbol(e.target.value)}
+                    value={inputSymbol} // Use inputSymbol for the input
+                    onChange={(e) => setInputSymbol(e.target.value)}
                     placeholder="Enter stock symbol (e.g., TSLA)"
                 />
                 <button onClick={searchStock}>Search</button>
