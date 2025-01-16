@@ -6,9 +6,7 @@ __pycache__/
 *.db
 *.sqlite3
 *.egg-info/
-*.env
 *.venv/
-env/
 venv/
 *.log
 
